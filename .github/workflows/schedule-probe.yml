@@ -3,7 +3,7 @@ name: Temporary Schedule Probe
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 7 * * *' # 15:00 Asia/Shanghai on November 25, 2026
+    - cron: '20 7 * * *' # 15:20 Asia/Shanghai on November 25, 2026
 
 permissions:
   contents: read
