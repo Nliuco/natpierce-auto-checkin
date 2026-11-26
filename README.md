@@ -1,25 +1,33 @@
 # 🚀 皎月连自动签到
 
-⚠️首先，长期使用强烈建议支持皎月连作者的订阅服务。⚠️
+> [!TIP]
+> 如果你打算长期使用皎月连，建议订阅以支持原作者。
 
-⚠️本项目仅为业余时间所做娱乐项目，本人不承担非本人使用本项目所带来的风险和后果！⚠️
+> [!WARNING]
+> 本项目仅供娱乐。使用本项目带来的风险和后果由使用者自行承担。
 
-基于 GitHub Actions 的自动化签到脚本，用于 [natpierce.cn](https://www.natpierce.cn/) 网站。每天自动签到并通过微信推送结果。
+本仓库 Fork 自 [doubletree6/Jiaoyuelian-autocheckin](https://github.com/doubletree6/Jiaoyuelian-autocheckin)，用于通过 GitHub Actions 自动完成 [natpierce.cn](https://www.natpierce.cn/) 签到，并通过 NotifyX 推送签到结果。
+
+## 🔧 本 Fork 的改动
+
+- 每日签到时间调整为北京时间 **12:16**。
+- 将 `actions/checkout`、`actions/setup-node` 和 `actions/setup-python` 升级到 `v7`。
+- 将签到结果推送服务从 PushPlus 切换为 NotifyX（码达），使用 NotifyX API 密钥和默认公众号渠道。
 
 ## ✨ 功能特性
 
 - 🤖 全自动签到，无需手动操作
 - 🔐 账号密码通过 GitHub Secrets 安全存储
 - 🧩 自动识别并解决滑块验证码
-- 📱 微信推送签到结果（通过 PushPlus）
-- ⏰ 每天北京时间 12:16 自动执行
+- 📱 微信推送签到结果（通过 NotifyX 默认公众号渠道）
+- ⏰ 每天计划于北京时间 12:16 自动触发
 
 ## 📋 准备工作
 
-### 1. 获取 PushPlus Token（用于微信推送）
+### 1. 准备 NotifyX API 密钥（用于微信推送）
 
-1. 微信搜索并关注公众号「**PushPlus推送加**」
-2. 在公众号菜单中找到 Token，复制保存
+1. 登录 [NotifyX（码达）](https://www.notifyx.cn/)
+2. 确认默认推送渠道为公众号，并在平台生成或复制 API 密钥
 
 
 ### 2. Fork 本仓库
@@ -41,7 +49,7 @@
 |------|-----|------|
 | `NATPIERCE_USERNAME` | 你的手机号或邮箱 | 皎月连登录账号 |
 | `NATPIERCE_PASSWORD` | 你的密码 |  |
-| `PUSHPLUS_TOKEN` | 你的 Token | 从 PushPlus 公众号获取 |
+| `NOTIFYX_API_KEY` | 你的 API 密钥 | 从 NotifyX 平台获取 |
 
 **添加示例：**
 
@@ -52,9 +60,12 @@ Secret: your_email@example.com
 Name: NATPIERCE_PASSWORD  
 Secret: YourPassword123.
 
-Name: PUSHPLUS_TOKEN
+Name: NOTIFYX_API_KEY
 Secret: abc123def456ghi789
 ```
+
+> [!NOTE]
+> 如果你之前配置过 `PUSHPLUS_TOKEN`，请新增 `NOTIFYX_API_KEY`，并在仓库 **Settings → Secrets and variables → Actions** 中删除旧的 `PUSHPLUS_TOKEN`。
 
 ### Step 3: 启用 GitHub Actions
 
@@ -73,7 +84,10 @@ Secret: abc123def456ghi789
 
 ### 方式二：定时自动运行
 
-工作流会在每天 **UTC 04:16**（北京时间 **12:16**）自动执行。
+工作流计划在每天 **UTC 04:16**（北京时间 **12:16**）触发。
+
+> [!NOTE]
+> `schedule` 设定的是计划触发时间，GitHub Actions 不保证准点启动。负载较高时（例如整点），工作流可能明显延迟，延迟时长不固定；极端情况下，排队中的任务也可能被丢弃。详见 [GitHub 关于定时工作流延迟的说明](https://docs.github.com/en/actions/how-tos/troubleshoot-workflows#scheduled-workflows-running-at-unexpected-times)。
 
 如果需要修改时间，编辑 `.github/workflows/daily-checkin.yml` 中的 cron 表达式：
 
@@ -110,9 +124,9 @@ schedule:
 
 ### Q: 没有收到微信推送？
 
-1. 确认已关注「PushPlus推送加」公众号
-2. 检查 `PUSHPLUS_TOKEN` 是否正确
-3. PushPlus 免费版有每日推送限制
+1. 确认 NotifyX 默认推送渠道已配置为公众号
+2. 检查仓库 Secret `NOTIFYX_API_KEY` 是否存在且填写正确
+3. 查看 GitHub Actions 运行日志中的推送接口响应
 
 ### Q: 如何关闭自动签到？
 
@@ -131,10 +145,10 @@ schedule:
 ```
 .
 ├── .github/workflows/
-│   └── daily-checkin.yml   # GitHub Actions 工作流
+│   └── daily-checkin.yml   # 每日签到工作流
 ├── checkin.js              # 签到主脚本
 ├── solve_slider.py         # 滑块验证码求解器
-├── push_notification.py    # PushPlus 推送脚本
+├── push_notification.py    # NotifyX 推送脚本
 └── README.md
 ```
 
