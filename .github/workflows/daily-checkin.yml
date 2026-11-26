@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3 # 检出你的仓库代码
+      uses: actions/checkout@v7 # 检出你的仓库代码
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v7
       with:
         node-version: '18' # 或者你希望的Node.js版本
 
@@ -23,7 +23,7 @@ jobs:
       run: npm install puppeteer # 安装puppeteer库
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v7
       with:
         python-version: '3.x' # Use the latest Python 3.x version
 
